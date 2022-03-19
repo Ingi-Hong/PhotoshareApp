@@ -52,6 +52,7 @@ def user_loader(email):
 		return
 	user = User()
 	user.id = email
+
 	
 	return user
 
@@ -164,6 +165,11 @@ def isEmailUnique(email):
 		return False
 	else:
 		return True
+
+def getUsersAlbums(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT name,date,uid FROM Albums WHERE user_id = '{0}' ".format(uid))
+	return cursor.fetchall()
 #end login code
 
 @app.route('/profile')
@@ -186,7 +192,7 @@ def upload_file():
 		caption = request.form.get('caption')
 		photo_data =imgfile.read()
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s )''' ,(photo_data,uid, caption))
+		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s, %s )''' ,(photo_data,uid, caption))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
@@ -194,6 +200,24 @@ def upload_file():
 		return render_template('upload.html')
 #end photo uploading code
 
+
+
+#album
+@app.route ('/create', methods = ['GET', 'POST'])
+@flask_login.login_required
+def create_album():
+	if request.method == 'POST':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		a_name = request.form.get ('album name')
+		date = request.form.get ('date')
+		cursor = conn.cursor()
+		cursor.execute('''INSERT INTO Albums (a_name, date, uid) VALUES (%s, %s,%s)''',(a_name, date, uid))
+		conn.commit()
+		return render_template('create.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
+		
+	else: 
+		return render_template('create.html')
+		
 
 #default page
 @app.route("/", methods=['GET'])
