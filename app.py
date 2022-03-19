@@ -124,7 +124,7 @@ def register_user():
 	try:
 		first_name = request.form.get('first_name')
 		last_name = request.form.get ('last_name')
-		dob = request.form.get('dob')
+		
 		email=request.form.get('email')
 		password=request.form.get('password')
 		
@@ -134,11 +134,12 @@ def register_user():
 	cursor = conn.cursor()
 	test =  isEmailUnique(email)
 	if test:
-		print(cursor.execute("INSERT INTO Users (email, password, is_registered,first_name,last_name,dob) VALUES ('{0}', '{1}', '{2}', '{3}','{4}', '{5}')".format(email, password, 0, first_name, last_name, dob)))
+		print(cursor.execute("INSERT INTO Users (email, password, is_registered,first_name,last_name) VALUES ('{0}', '{1}', 0, '{2}','{3}')".format(email, password, first_name, last_name)))
 		conn.commit()
 		#log user in
 		user = User()
 		user.id = email
+		
 		flask_login.login_user(user)
 		return render_template('hello.html', name=email, message='Account Created!')
 	else:
