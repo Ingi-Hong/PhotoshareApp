@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Stevieismalo69!'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -52,6 +52,7 @@ def user_loader(email):
 		return
 	user = User()
 	user.id = email
+	
 	return user
 
 @login_manager.request_loader
@@ -121,15 +122,19 @@ def register():
 @app.route("/register", methods=['POST'])
 def register_user():
 	try:
+		first_name = request.form.get('first_name')
+		last_name = request.form.get ('last_name')
+		dob = request.form.get('dob')
 		email=request.form.get('email')
 		password=request.form.get('password')
+		
 	except:
 		print("couldn't find all tokens") #this prints to shell, end users will not see this (all print statements go to shell)
 		return flask.redirect(flask.url_for('register'))
 	cursor = conn.cursor()
 	test =  isEmailUnique(email)
 	if test:
-		print(cursor.execute("INSERT INTO Users (email, password) VALUES ('{0}', '{1}')".format(email, password)))
+		print(cursor.execute("INSERT INTO Users (email, password, is_registered,first_name,last_name,dob) VALUES ('{0}', '{1}', '{2}', '{3}','{4}', '{5}')".format(email, password, 0, first_name, last_name, dob)))
 		conn.commit()
 		#log user in
 		user = User()
@@ -143,7 +148,7 @@ def register_user():
 def getUsersPhotos(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
-	return cursor.fetchall() #NOTE return a list of tuples, [(imgdata, pid, caption), ...]
+	return cursor.fetchall() #NOTE list of tuples, [(imgdata, pid), ...]
 
 def getUserIdFromEmail(email):
 	cursor = conn.cursor()
@@ -180,9 +185,9 @@ def upload_file():
 		caption = request.form.get('caption')
 		photo_data =imgfile.read()
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s )''', (photo_data, uid, caption))
+		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s )''' ,(photo_data,uid, caption))
 		conn.commit()
-		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid), base64=base64)
+		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
 	else:
 		return render_template('upload.html')
@@ -199,3 +204,5 @@ if __name__ == "__main__":
 	#this is invoked when in the shell  you run
 	#$ python app.py
 	app.run(port=5000, debug=True)
+
+
