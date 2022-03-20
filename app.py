@@ -149,12 +149,12 @@ def register_user():
 
 def getUsersPhotos(uid):
 	cursor = conn.cursor()
-	cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
+	cursor.execute("SELECT data, p_id, caption FROM photos WHERE owner_id= '{0}'".format(uid))
 	return cursor.fetchall() #NOTE list of tuples, [(imgdata, pid), ...]
 
 def getUserIdFromEmail(email):
 	cursor = conn.cursor()
-	cursor.execute("SELECT user_id  FROM users WHERE email = '{0}'".format(email))
+	cursor.execute("SELECT email FROM users WHERE email = '{0}'".format(email))
 	return cursor.fetchone()[0]
 
 def isEmailUnique(email):
@@ -191,8 +191,10 @@ def upload_file():
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data =imgfile.read()
+		# fix this later 
+		a_id = 1
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) VALUES (%s, %s, %s, %s )''' ,(photo_data,uid, caption))
+		cursor.execute("INSERT INTO photos (data, caption, a_id) VALUES (%s, %s, %s )", (photo_data, caption, a_id))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
