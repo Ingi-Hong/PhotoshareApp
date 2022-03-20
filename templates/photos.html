@@ -1,0 +1,21 @@
+
+<!doctype html>
+<head>
+    <title> Photo Gallery </title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Photo Gallery </h1>
+        </div>
+        {% if photos %}
+            <h2>Here are your photos</h2>
+            <ul>
+                {% for photo in photos %}
+
+                <li>{{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/>
+                </li>
+     {% endfor %}
+            </ul>
+     {% endif %}
+        </body>

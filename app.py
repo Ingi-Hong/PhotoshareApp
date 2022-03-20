@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -169,7 +169,13 @@ def isEmailUnique(email):
 def getUsersAlbums(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT name,date,uid FROM Albums WHERE user_id = '{0}' ".format(uid))
-	return cursor.fetchall()
+	return cursor.fetchall()\
+
+def getAllPhotos(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT data, p_id, caption FROM photos".format(uid))
+	return cursor.fetchall()\
+
 #end login code
 
 @app.route('/profile')
@@ -195,6 +201,7 @@ def upload_file():
 		a_id = 1
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
+
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
@@ -219,12 +226,27 @@ def create_album():
 		
 	else: 
 		return render_template('create.html')
-		
+
+
+ #photos library
+@app.route ('/photos',methods=['GET'])
+@flask_login.login_required 
+def photo_library():
+	if request.method == 'GET':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		return render_template('photos.html', name=flask_login.current_user.id,message = ' Photo Library', photos=getAllPhotos(uid),base64=base64)
+	else:
+		return render_template('hello.html')
+
+
+
 
 #default page
 @app.route("/", methods=['GET'])
 def hello():
 	return render_template('hello.html', message='Welecome to Photoshare')
+
+
 
 
 if __name__ == "__main__":
