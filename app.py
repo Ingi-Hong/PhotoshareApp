@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -52,7 +52,7 @@ def user_loader(email):
 		return
 	user = User()
 	user.id = email
-
+	
 	
 	return user
 
@@ -213,7 +213,7 @@ def create_album():
 		cursor = conn.cursor()
 		cursor.execute('''INSERT INTO Albums (a_name, date, uid) VALUES (%s, %s,%s)''',(a_name, date, uid))
 		conn.commit()
-		return render_template('create.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
+		return render_template('hello.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
 		
 	else: 
 		return render_template('create.html')
