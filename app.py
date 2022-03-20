@@ -24,7 +24,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -169,7 +169,7 @@ def isEmailUnique(email):
 
 def getUsersAlbums(uid):
 	cursor = conn.cursor()
-	cursor.execute("SELECT name,date,uid FROM Albums WHERE user_id = '{0}' ".format(uid))
+	cursor.execute("SELECT name,date,owner_id,a_id FROM albums WHERE owner_id = '{0}' ".format(uid))
 	return cursor.fetchall()\
 
 def getAllPhotos(uid):
@@ -198,17 +198,25 @@ def upload_file():
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data = imgfile.read()
-		albums = getUsersAlbums()
+		album = request.form.get('album')
+		albums = getUsersAlbums(uid)
+		print(album)
+		print(albums)
+		check = [item for item in albums if item[0] == album]
 
-		# fix this later 
-		a_id = 1
+		try:
+			a_id = check[0][3]
+			print(a_id)
+		except:
+			return render_template('hello.html', name=flask_login.current_user.id, message='Create Album First!', photos=getUsersPhotos(uid),base64=base64)
+
 
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
 
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
-	#The method is GET so we return a  HTML form to upload the a photo.
+	#The method is GET so we return a HTML form to upload the a photo.
 	else:
 		return render_template('upload.html')
 #end photo uploading code
@@ -229,7 +237,6 @@ def create_album():
 	else: 
 		return render_template('create.html')
 
-
  #photos library
 @app.route ('/photos',methods=['GET'])
 @flask_login.login_required 
@@ -240,16 +247,10 @@ def photo_library():
 	else:
 		return render_template('hello.html')
 
-
-
-
 #default page
 @app.route("/", methods=['GET'])
 def hello():
 	return render_template('hello.html', message='Welecome to Photoshare')
-
-
-
 
 if __name__ == "__main__":
 	#this is invoked when in the shell  you run
