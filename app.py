@@ -194,7 +194,7 @@ def upload_file():
 		# fix this later 
 		a_id = 1
 		cursor = conn.cursor()
-		cursor.execute("INSERT INTO photos (data, caption, a_id) VALUES (%s, %s, %s)", (photo_data, caption, a_id))
+		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
