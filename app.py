@@ -200,7 +200,8 @@ def upload_file():
 		# fix this later 
 		a_id = 1
 		cursor = conn.cursor()
-		cursor.execute("INSERT INTO photos (data, caption, a_id) VALUES (%s, %s, %s )", (photo_data, caption, a_id))
+		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
+
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
@@ -219,7 +220,7 @@ def create_album():
 		a_name = request.form.get ('album name')
 		date = request.form.get ('date')
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Albums (a_name, date, uid) VALUES (%s, %s,%s)''',(a_name, date, uid))
+		cursor.execute("INSERT INTO albums (Name, date, owner_id) VALUES (%s, %s,%s)",(a_name, date, uid))
 		conn.commit()
 		return render_template('hello.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
 		
