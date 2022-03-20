@@ -213,7 +213,7 @@ def create_album():
 		a_name = request.form.get ('album name')
 		date = request.form.get ('date')
 		cursor = conn.cursor()
-		cursor.execute('''INSERT INTO Albums (a_name, date, uid) VALUES (%s, %s,%s)''',(a_name, date, uid))
+		cursor.execute("INSERT INTO albums (Name, date, owner_id) VALUES (%s, %s,%s)",(a_name, date, uid))
 		conn.commit()
 		return render_template('hello.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
 		
