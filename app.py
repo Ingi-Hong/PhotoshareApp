@@ -9,6 +9,7 @@
 # see links for further understanding
 ###################################################
 
+from getpass import getuser
 import flask
 from flask import Flask, Response, request, render_template, redirect, url_for
 from flaskext.mysql import MySQL
@@ -190,9 +191,12 @@ def upload_file():
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
-		photo_data =imgfile.read()
+		photo_data = imgfile.read()
+		albums = getUsersAlbums()
+
 		# fix this later 
 		a_id = 1
+
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
 		conn.commit()
@@ -201,8 +205,6 @@ def upload_file():
 	else:
 		return render_template('upload.html')
 #end photo uploading code
-
-
 
 #album
 @app.route ('/create', methods = ['GET', 'POST'])
