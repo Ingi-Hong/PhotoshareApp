@@ -1,0 +1,20 @@
+
+<!doctype html>
+<head>
+    <title> Photo Gallery </title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Comment Section </h1>
+        </div>
+        {% if comments %}
+            <h2>Comments</h2>
+            <ul>
+                {% for comment in comments %}
+
+                <li> {{comment}}<br>
+                </li>
+     {% endfor %}
+            </ul>
+     {% endif %}
+        </body>

@@ -167,9 +167,14 @@ def isEmailUnique(email):
 	else:
 		return True
 
+def getComments(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT text FROM comments WHERE c_id= '{0}'".format(uid))
+	return
+
 def getUsersAlbums(uid):
 	cursor = conn.cursor()
-	cursor.execute("SELECT name,date,uid FROM Albums WHERE user_id = '{0}' ".format(uid))
+	cursor.execute("SELECT name,date,uid FROM albums WHERE user_id = '{0}' ".format(uid))
 	return cursor.fetchall()\
 
 def getAllPhotos(uid):
@@ -198,7 +203,7 @@ def upload_file():
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data = imgfile.read()
-		albums = getUsersAlbums()
+		albums = getUsersAlbums(uid)
 
 		# fix this later 
 		a_id = 1
@@ -236,12 +241,25 @@ def create_album():
 def photo_library():
 	if request.method == 'GET':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
+		
 		return render_template('photos.html', name=flask_login.current_user.id,message = ' Photo Library', photos=getAllPhotos(uid),base64=base64)
 	else:
 		return render_template('hello.html')
 
+@app.route('/comments', methods = ['GET','POST'])
+@flask_login.login_required
+def comment_section():
+	if request.method == 'PUSH':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		text= request.form.get('text')
+		date = request.form.get ('date')
+		cursor = conn.cursor()
 
-
+		cursor.execute("INSERT INTO comments (text,date,uid) VALUES (%s,%s,%s)",(text,date, uid))
+		conn.commit()
+		return render_template('comments.html', name = flask_login.current_user_id, message= 'Comment Posted', comments = getComments(uid),base64=base64 )
+	else: 
+		return render_template('comments.html', name = flask_login.current_user_id, message= 'Comment Posted', comments = getComments(uid),base64=base64 )
 
 #default page
 @app.route("/", methods=['GET'])
