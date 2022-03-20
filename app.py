@@ -23,7 +23,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -194,7 +194,7 @@ def upload_file():
 		# fix this later 
 		a_id = 1
 		cursor = conn.cursor()
-		cursor.execute("INSERT INTO photos (data, caption, a_id) VALUES (%s, %s, %s )", (photo_data, caption, a_id))
+		cursor.execute("INSERT INTO photos (data, caption, a_id) VALUES (%s, %s, %s)", (photo_data, caption, a_id))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a  HTML form to upload the a photo.
