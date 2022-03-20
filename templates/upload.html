@@ -6,9 +6,9 @@
         <div class="title">
             <h1>Upload a photo to Photoshare</h1>
         </div>
-        <label for = "album" > Enter album name: </label>
-        <input type ="album_name" name = "album_name" /><br />
             <form method="post" enctype="multipart/form-data" action="/upload">
+                <label for = "album" > Enter album name: </label>
+                <input type ="text" name = "album" /><br />
                 <label for="photo">Select photo:</label>
                 <input type="file" name="photo" required='true' /><br />
                 <label for="caption">Please caption:</label>
