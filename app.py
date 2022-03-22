@@ -167,9 +167,9 @@ def isEmailUnique(email):
 	else:
 		return True
 
-def getComments(uid):
+def getComments(p_id):
 	cursor = conn.cursor()
-	cursor.execute("SELECT text FROM comments WHERE c_id= '{0}'".format(uid))
+	cursor.execute("SELECT text FROM comments WHERE c_id = '{0}'".format(p_id))
 	return
 
 def getUsersAlbums(uid):
@@ -206,7 +206,6 @@ def upload_file():
 		imgfile = request.files['photo']
 		caption = request.form.get('caption')
 		photo_data = imgfile.read()
-
 		album = request.form.get('album')
 		albums = getUsersAlbums(uid)
 		print(album)
@@ -259,21 +258,24 @@ def photo_library():
 		return render_template('hello.html')
 
 
-@app.route('/comments', methods = ['GET','POST'])
+@app.route('/comments/<pid>', methods = ['GET','POST'])
 @flask_login.login_required
-def comment_section():
+def comment_section(pid):
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
+		p_id = pid 
 		text= request.form.get('text')
 		date = request.form.get ('date')
 		cursor = conn.cursor()
-
-		cursor.execute("INSERT INTO comments (text,date,uid) VALUES (%s,%s,%s)",(text,date, uid))
+		cursor.execute("INSERT INTO comments (text,date,uid, pid) VALUES (%s,%s,%s, %s)",(text,date, uid, p_id))
 		conn.commit()
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(uid),base64=base64 )
+		redirect(url_for('/comments/{{photo[1]}}'))
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(p_id),base64=base64 )
 	else: 
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(uid),base64=base64 )
+		p_id = pid 
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comments', comments = getComments(p_id),base64=base64 )
+    	
 
 
 #default page
