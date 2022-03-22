@@ -7,26 +7,45 @@
             <h1>Social </h1>
         </div>
 
+            {% if message %}
+            <li>Friend added!</li>
+            {% endif %}
             <h2></h2>
         
             <h2>Friends</h2>
+
+            <h3>Your Friends</h3>
+
+            {% if friends %}
+            {% for friend in friends %}
+            <li>{{friend}}</li>
+            {% endfor %}
+            {% endif %}
+
             <h3>Add a Friend</h3>
 
             <form method="post" enctype="multipart/form-data" action="/social">
-                <label for="friend">Search:</label>
-                <input type="text" name="friend" required='true' /><br />
-                <input type="submit" value="Upload" />
+                <label for="friendRequest">Add friend (use email):</label>
+                <input type="text" name="friendrequest" required='true' /><br />
+                <input type="submit" value="Add" />
             </form>
 
+            <form method="post" enctype="multipart/form-data" action="/social">
+                <label for="search">Search users by name:</label>
+                <input type="text" name="search" required='true' /><br />
+                <input type="submit" value="Search" />
+            </form>
             <ul>
-                {% if friends %}
-                {% for friend in friends %}
-
-                <li>{friend}<br>
+                {% if searched %}
+                <h2>Search Results</h2>
+                {% for user in searched %}
+                
+                <li>{{user[0]}} {{user[1]}}<br>
+                    email: {{user[2]}}
                     
                 </li>
                  {% endfor %}
             </ul>
 
-     {% endif %}
+                {% endif %}
         </body>

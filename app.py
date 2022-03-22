@@ -185,7 +185,7 @@ def getAllPhotos(uid):
 
 def getUsersFriends(uid):
 	cursor = conn.cursor()
-	cursor.execute("SELECT user2 FROM friends WHERE user1 = '{0}' ".format(uid))
+	cursor.execute("SELECT first_name, last_name, email FROM users WHERE email IN (SELECT user2 FROM friends WHERE user1 = '{0}') ".format(uid))
 	return cursor.fetchall()\
 
 #end login code
@@ -267,10 +267,7 @@ def comment_section(pid):
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		p_id = pid
-		print("error")
-		print(p_id)
-		text= request.form.get('text')
-		date = request.form.get ('date')
+		text = request.form.get('text')
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO comments (text,date,uid, pid) VALUES (%s,%s,%s, %s)",(text, time.strftime('%Y-%m-%d'), uid, p_id))
 		conn.commit()
@@ -283,11 +280,34 @@ def comment_section(pid):
 @app.route('/social', methods = ['GET', 'POST'])
 @flask_login.login_required
 def social():
-	if request.method == 'GET':
-		uid = getUserIdFromEmail(flask_login.current_user.id)
-		friends = getUsersFriends(uid)
+	uid = getUserIdFromEmail(flask_login.current_user.id)
+	friends = getUsersFriends(uid)
 
+	if request.method == 'GET':
 		return render_template('social.html', name = flask_login.current_user.id, friends = friends)
+	else:
+
+		if 'search' in request.form:
+			search = request.form.get("search")
+			cursor = conn.cursor()
+			cursor.execute("SELECT first_name, last_name, email FROM users WHERE first_name LIKE '%{0}%' OR last_name LIKE '%{1}%'".format(search, search))
+			searched = cursor.fetchall()
+			return render_template('social.html', name = flask_login.current_user.id, searched = searched, friends = friends)
+
+		else:
+			email = request.form.get("friendrequest")
+			cursor = conn.cursor()
+
+			# Check to see if friendship exists 
+			if cursor.execute("SELECT user1, user2 FROM friends WHERE user1 = '{0}' and user2 = '{1}'".format(email, uid)):
+				#this means there are greater than zero entries with that email
+				return render_template('social.html', name = flask_login.current_user.id, message="Friend Already Added!")
+
+			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (uid, email))
+			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (email, uid))
+			return render_template('social.html', name = flask_login.current_user.id, message="Friend added!", friends = friends)
+
+
 
 #default page
 @app.route("/", methods=['GET'])
