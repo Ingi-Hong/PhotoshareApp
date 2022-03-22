@@ -18,7 +18,10 @@
 
             {% if friends %}
             {% for friend in friends %}
-            <li>{{friend}}</li>
+            <li>
+                {{friend[0]}} {{friend[1]}} <br>
+                email: {{friend[2]}}
+            </li>
             {% endfor %}
             {% endif %}
 

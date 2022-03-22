@@ -137,7 +137,7 @@ def register_user():
 	cursor = conn.cursor()
 	test =  isEmailUnique(email)
 	if test:
-		print(cursor.execute("INSERT INTO users (email, password, is_registered,first_name,last_name) VALUES ('{0}', '{1}', 0, '{2}','{3}')".format(email, password, first_name, last_name)))
+		print(cursor.execute("INSERT INTO users (email, password, is_registered,first_name, last_name, ) VALUES ('{0}', '{1}', 1, '{2}','{3}')".format(email, password, first_name, last_name)))
 		conn.commit()
 		#log user in
 		user = User()
@@ -178,9 +178,9 @@ def getUsersAlbums(uid):
 	cursor.execute("SELECT name,date,owner_id,a_id FROM albums WHERE owner_id = '{0}' ".format(uid))
 	return cursor.fetchall()\
 
-def getAllPhotos(uid):
+def getAllPhotos():
 	cursor = conn.cursor()
-	cursor.execute("SELECT data, p_id, caption FROM photos".format(uid))
+	cursor.execute("SELECT data, p_id, caption FROM photos")
 	return cursor.fetchall()\
 
 def getUsersFriends(uid):
@@ -265,8 +265,7 @@ def create_album():
 def photo_library():
 	if request.method == 'GET':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		
-		return render_template('photos.html', name= flask_login.current_user.id,message = ' Photo Library', photos=getAllPhotos(uid),base64=base64)
+		return render_template('photos.html', name= flask_login.current_user.id,message = ' Photo Library', photos=getAllPhotos(),base64=base64)
 	else:
 		return render_template('hello.html')
 
@@ -296,7 +295,6 @@ def social():
 	if request.method == 'GET':
 		return render_template('social.html', name = flask_login.current_user.id, friends = friends)
 	else:
-
 		if 'search' in request.form:
 			search = request.form.get("search")
 			cursor = conn.cursor()
@@ -315,6 +313,7 @@ def social():
 
 			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (uid, email))
 			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (email, uid))
+			conn.commit()
 			return render_template('social.html', name = flask_login.current_user.id, message="Friend added!", friends = friends)
 
 
