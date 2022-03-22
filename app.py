@@ -14,6 +14,7 @@ import flask
 from flask import Flask, Response, request, render_template, redirect, url_for
 from flaskext.mysql import MySQL
 import flask_login
+import time 
 
 #for image uploading
 import os, base64
@@ -24,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -169,15 +170,12 @@ def isEmailUnique(email):
 
 def getComments(p_id):
 	cursor = conn.cursor()
-	cursor.execute("SELECT text FROM comments WHERE c_id = '{0}'".format(p_id))
-	return
+	cursor.execute("SELECT text FROM comments WHERE pid = '{0}'".format(p_id))
+	return cursor.fetchall()\
 
 def getUsersAlbums(uid):
 	cursor = conn.cursor()
-
-
 	cursor.execute("SELECT name,date,owner_id,a_id FROM albums WHERE owner_id = '{0}' ".format(uid))
-
 	return cursor.fetchall()\
 
 def getAllPhotos(uid):
@@ -263,18 +261,19 @@ def photo_library():
 def comment_section(pid):
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		p_id = pid 
+		p_id = pid
+		print("error")
+		print(p_id)
 		text= request.form.get('text')
 		date = request.form.get ('date')
 		cursor = conn.cursor()
-		cursor.execute("INSERT INTO comments (text,date,uid, pid) VALUES (%s,%s,%s, %s)",(text,date, uid, p_id))
+		cursor.execute("INSERT INTO comments (text,date,uid, pid) VALUES (%s,%s,%s, %s)",(text, time.strftime('%Y-%m-%d'), uid, p_id))
 		conn.commit()
-		redirect(url_for('/comments/{{photo[1]}}'))
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(p_id),base64=base64 )
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(p_id),base64=base64, p_id = p_id )
 	else: 
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		p_id = pid 
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comments', comments = getComments(p_id),base64=base64 )
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comments', comments = getComments(p_id),base64=base64, p_id = p_id )
     	
 
 

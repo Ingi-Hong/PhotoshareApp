@@ -9,12 +9,9 @@
             <h1>Comment Section </h1>
         </div>
 
-        <form method="post" enctype="multipart/form-data" action="/comments">
+        <form method="post" enctype="multipart/form-data" action="/comments/{{p_id}}">
             <label for = "comment" > comment </label>
             <input type ="text" name = "text" /><br />
-            <label for = "date" > date </label>
-            <input type ="text" name = "date" /><br />
-            
             <input type="submit" value="post" />
         </form>
         
