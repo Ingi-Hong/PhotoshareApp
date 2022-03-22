@@ -1,0 +1,32 @@
+<!doctype html>
+<head>
+    <title> Social </title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Social </h1>
+        </div>
+
+            <h2></h2>
+        
+            <h2>Friends</h2>
+            <h3>Add a Friend</h3>
+
+            <form method="post" enctype="multipart/form-data" action="/social">
+                <label for="friend">Search:</label>
+                <input type="text" name="friend" required='true' /><br />
+                <input type="submit" value="Upload" />
+            </form>
+
+            <ul>
+                {% if friends %}
+                {% for friend in friends %}
+
+                <li>{friend}<br>
+                    
+                </li>
+                 {% endfor %}
+            </ul>
+
+     {% endif %}
+        </body>

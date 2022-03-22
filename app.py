@@ -170,7 +170,7 @@ def isEmailUnique(email):
 
 def getComments(p_id):
 	cursor = conn.cursor()
-	cursor.execute("SELECT text FROM comments WHERE pid = '{0}'".format(p_id))
+	cursor.execute("SELECT text, uid, date FROM comments WHERE pid = '{0}'".format(p_id))
 	return cursor.fetchall()\
 
 def getUsersAlbums(uid):
@@ -181,6 +181,11 @@ def getUsersAlbums(uid):
 def getAllPhotos(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT data, p_id, caption FROM photos".format(uid))
+	return cursor.fetchall()\
+
+def getUsersFriends(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT user2 FROM friends WHERE user1 = '{0}' ".format(uid))
 	return cursor.fetchall()\
 
 #end login code
@@ -269,13 +274,20 @@ def comment_section(pid):
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO comments (text,date,uid, pid) VALUES (%s,%s,%s, %s)",(text, time.strftime('%Y-%m-%d'), uid, p_id))
 		conn.commit()
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(p_id),base64=base64, p_id = p_id )
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comment Posted', comments = getComments(p_id),base64=base64, p_id = p_id, uid = uid )
 	else: 
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		p_id = pid 
-		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comments', comments = getComments(p_id),base64=base64, p_id = p_id )
+		return render_template('comments.html', name = flask_login.current_user.id, message= 'Comments', comments = getComments(p_id),base64=base64, p_id = p_id, uid = uid)
     	
+@app.route('/social', methods = ['GET', 'POST'])
+@flask_login.login_required
+def social():
+	if request.method == 'GET':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		friends = getUsersFriends(uid)
 
+		return render_template('social.html', name = flask_login.current_user.id, friends = friends)
 
 #default page
 @app.route("/", methods=['GET'])

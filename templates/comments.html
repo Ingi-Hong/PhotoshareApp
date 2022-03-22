@@ -14,14 +14,20 @@
             <input type ="text" name = "text" /><br />
             <input type="submit" value="post" />
         </form>
-        
+        <h2>Comments</h2>
         {% if comments %}
-            <h2>Comments</h2>
+        
             <ul>
                 {% for comment in comments %}
 
-                <li> {{comment}}<br>
+                <li> 
+                    __________________ <br>
+                    {{uid}} on {{comment[2]}}: <br>
+                    <br>
+                    {{comment[0]}}<br>
+                    __________________<br>
                 </li>
+
      {% endfor %}
             </ul>
      {% endif %}
