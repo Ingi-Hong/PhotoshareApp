@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -192,6 +192,7 @@ def getTaggedPhotos(tags):
 	cursor = conn.cursor()
 	cursor.execute("SELECT data, p_id, caption FROM photos WHERE p_id IN (SELECT tags FROM tagged_photos WHERE tags = '{0}') ".format(tags))
 	return cursor.fetchall()\
+
 #end login code
 
 @app.route('/profile')
@@ -230,13 +231,14 @@ def upload_file():
 
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
+
 		conn.commit()
 		if tags != None:
 			cursor.execute("INSERT INTO tags (tag) VALUES (%s)", (tags))
 			conn.commit()
 			cursor.execute("INSERT INTO tagged_photos (tags) VALUES (%s)", (tags))
 			conn.commit()
-			
+
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a HTML form to upload the a photo.
 	else:
@@ -253,9 +255,10 @@ def create_album():
 		date = request.form.get ('date')
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO albums (Name, date, owner_id) VALUES (%s, %s,%s)",(a_name, date, uid))
+		cursor.execute()
 		conn.commit()
 		return render_template('hello.html', name = flask_login.current_user.id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
-		
+	
 	else: 
 		return render_template('create.html')
 
