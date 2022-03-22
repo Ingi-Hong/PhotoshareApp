@@ -14,6 +14,7 @@
 
                 <li>{{photo[2]}}<br>
                     <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}'/>
+                    <li><a href='/comments'>Comment section</a> </li>
                 </li>
      {% endfor %}
             </ul>
