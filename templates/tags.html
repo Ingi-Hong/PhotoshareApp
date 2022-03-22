@@ -1,0 +1,27 @@
+
+<!doctype html>
+<head>
+    <title> Social </title>
+</head>
+
+<body> 
+
+
+<h3>Look for Tags</h3>
+
+<form method="post" enctype="multipart/form-data" action="/tags">
+    <label for="tags">Search for tags:</label>
+    <input type="text" name="friendrequest" required='true' /><br />
+    <input type="submit" value="Look" />
+</form>
+
+{% if tagged%}
+Results:
+    {% for tag in tagged %}
+    <li>{{tag[1]}}</li>
+    {% endfor %}
+    {% endif %}
+
+
+
+</body>

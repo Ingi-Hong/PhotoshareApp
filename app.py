@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -188,6 +188,10 @@ def getUsersFriends(uid):
 	cursor.execute("SELECT first_name, last_name, email FROM users WHERE email IN (SELECT user2 FROM friends WHERE user1 = '{0}') ".format(uid))
 	return cursor.fetchall()\
 
+def getTaggedPhotos(tags):
+	cursor = conn.cursor()
+	cursor.execute("SELECT data, p_id, caption FROM photos WHERE p_id IN (SELECT tags FROM tagged_photos WHERE tags = '{0}') ".format(tags))
+	return cursor.fetchall()\
 #end login code
 
 @app.route('/profile')
@@ -210,6 +214,7 @@ def upload_file():
 		caption = request.form.get('caption')
 		photo_data = imgfile.read()
 		album = request.form.get('album')
+		tags = request.form.get('tags')
 		albums = getUsersAlbums(uid)
 		print(album)
 		print(albums)
@@ -225,8 +230,13 @@ def upload_file():
 
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO photos (data, caption, a_id, owner_id) VALUES (%s, %s, %s, %s)", (photo_data, caption, a_id, uid))
-
 		conn.commit()
+		if tags != None:
+			cursor.execute("INSERT INTO tags (tag) VALUES (%s)", (tags))
+			conn.commit()
+			cursor.execute("INSERT INTO tagged_photos (tags) VALUES (%s)", (tags))
+			conn.commit()
+			
 		return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!', photos=getUsersPhotos(uid),base64=base64)
 	#The method is GET so we return a HTML form to upload the a photo.
 	else:
@@ -244,7 +254,7 @@ def create_album():
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO albums (Name, date, owner_id) VALUES (%s, %s,%s)",(a_name, date, uid))
 		conn.commit()
-		return render_template('hello.html', name = flask_login.current_user_id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
+		return render_template('hello.html', name = flask_login.current_user.id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
 		
 	else: 
 		return render_template('create.html')
@@ -306,6 +316,22 @@ def social():
 			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (uid, email))
 			cursor.execute("INSERT INTO friends (user1, user2) VALUES (%s, %s)", (email, uid))
 			return render_template('social.html', name = flask_login.current_user.id, message="Friend added!", friends = friends)
+
+
+@app.route ('/tags', methods = ['GET', 'POST'])
+@flask_login.login_required
+def tags():
+	if request.method == 'POST':
+		tags = request.form.get('tags')
+	# cursor = conn.cursor()
+	# cursor.execute("SELECT p_id, tags FROM tagged_photos where tags = '{0}'".format(p_id))
+		tagged = getTaggedPhotos(tags)
+
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged )
+
+	else: 
+
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found")
 
 
 
