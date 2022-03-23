@@ -190,7 +190,7 @@ def getUsersFriends(uid):
 
 def getTaggedPhotos(tags):
 	cursor = conn.cursor()
-	cursor.execute("SELECT data, p_id, caption FROM photos WHERE p_id IN (SELECT tags FROM tagged_photos WHERE tags = '{0}') ".format(tags))
+	cursor.execute("SELECT data, p_id, caption FROM photos WHERE p_id IN (SELECT p_id FROM tagged_photos WHERE tags = '{0}') ".format(tags))
 	return cursor.fetchall()\
 
 #end login code
@@ -217,13 +217,10 @@ def upload_file():
 		album = request.form.get('album')
 		tags = request.form.get('tags')
 		albums = getUsersAlbums(uid)
-		print(album)
-		print(albums)
 		check = [item for item in albums if item[0] == album]
 
 		try:
 			a_id = check[0][3]
-			print(a_id)
 		except:
 			return render_template('hello.html', name=flask_login.current_user.id, message='Create Album First!', photos=getUsersPhotos(uid),base64=base64)
 
@@ -325,14 +322,19 @@ def social():
 def tags():
 	if request.method == 'POST':
 		tags = request.form.get("tags")
+<<<<<<< HEAD
 	# cursor = conn.cursor()
 	# cursor.execute("SELECT p_id, tags FROM tagged_photos where tags = '{0}'".format(p_id))
+=======
+		print(tags)
+		# cursor = conn.cursor()
+		# cursor.execute("SELECT p_id, tags FROM tagged_photos where tags = '{0}'".format(p_id))
+>>>>>>> main
 		tagged = getTaggedPhotos(tags)
-
+		print(tagged)
 		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged )
 
 	else: 
-
 		return render_template('tags.html', name= flask_login.current_user.id, message = "Found")
 
 

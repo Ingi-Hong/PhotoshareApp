@@ -11,7 +11,7 @@
 
 <form method="post" enctype="multipart/form-data" action="/tags">
     <label for="tags">Search for tags:</label>
-    <input type="text" name="friendrequest" required='true' /><br />
+    <input type="text" name="tags" required='true' /><br />
     <input type="submit" value="Look" />
 </form>
 
@@ -21,6 +21,8 @@ Results:
     <li>{{tag[1]}}</li>
     {% endfor %}
     {% endif %}
+
+
 
 
 
