@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -54,8 +54,6 @@ def user_loader(email):
 		return
 	user = User()
 	user.id = email
-	
-	
 	return user
 
 @login_manager.request_loader
@@ -107,6 +105,14 @@ def login():
 	#information did not match
 	return "<a href='/login'>Try again</a>\
 			</br><a href='/register'>or make an account</a>"
+
+
+@app.route('/anon')
+def anon():
+	user = User()
+	user.id = "guest"
+	flask_login.login_user(user)
+	return render_template('hello.html', message='You are now logged in as a guest user')
 
 @app.route('/logout')
 def logout():
@@ -216,6 +222,8 @@ def allowed_file(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
+	if flask_login.current_user.id == "guest":
+		return render_template('hello.html', message='Guest Users Cannot Upload Photos',base64=base64)
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		imgfile = request.files['photo']
@@ -257,6 +265,8 @@ def upload_file():
 @app.route ('/create', methods = ['GET', 'POST'])
 @flask_login.login_required
 def create_album():
+	if flask_login.current_user.id == "guest":
+		return render_template('hello.html', message='Guest Users Cannot Create Albums',base64=base64)
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		a_name = request.form.get ('album name')
@@ -333,6 +343,7 @@ def social():
 def tags():
 	if request.method == 'POST':
 		tags = request.form.get("tags")
+
 		
 		tagged = getTaggedPhotos(tags)
 
@@ -343,21 +354,27 @@ def tags():
 		cursor = conn.cursor()
 		cursor.execute("SELECT tags, COUNT(*) AS magnitude FROM tagged_photos GROUP BY tags ORDER BY magnitude DESC LIMIT 5")
 		famous = cursor.fetchall()
-		print(" ")
-		print(" ")
-		print(" ")
-		print(famous)
-		print(" ")
-		print(" ")
-		print(" ")
+		
 		return render_template('tags.html', name= flask_login.current_user.id, message = "Found", famous = famous, base64=base64)
 
 
+@app.route('/delete', methods = ['GET', 'POST'])
+@flask_login.login_required
+def delete():
+	uid = flask_login.current_user.id
+	if request.method == 'POST':
+		delete = request.form.get('delete')
+		
+	else:
+		return render_template('delete.html', photos=getUsersPhotos(uid), base64=base64)
 
 #default page
 @app.route("/", methods=['GET'])
 def hello():
 	return render_template('hello.html', message='Welecome to Photoshare')
+
+
+
 
 if __name__ == "__main__":
 	#this is invoked when in the shell  you run
