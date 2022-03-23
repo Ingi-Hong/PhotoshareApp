@@ -25,7 +25,7 @@ app.secret_key = 'super secret string'  # Change this!
 
 #These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'pro097'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -324,7 +324,7 @@ def social():
 @flask_login.login_required
 def tags():
 	if request.method == 'POST':
-		tags = request.form.get('tags')
+		tags = request.form.get("tags")
 	# cursor = conn.cursor()
 	# cursor.execute("SELECT p_id, tags FROM tagged_photos where tags = '{0}'".format(p_id))
 		tagged = getTaggedPhotos(tags)
