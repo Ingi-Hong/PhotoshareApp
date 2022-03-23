@@ -263,7 +263,7 @@ def create_album():
 		date = request.form.get ('date')
 		cursor = conn.cursor()
 		cursor.execute("INSERT INTO albums (Name, date, owner_id) VALUES (%s, %s,%s)",(a_name, date, uid))
-		cursor.execute()
+		
 		conn.commit()
 		return render_template('hello.html', name = flask_login.current_user.id, message = 'Album Created', albums = getUsersAlbums(uid), base64=base64 )
 	
@@ -333,15 +333,24 @@ def social():
 def tags():
 	if request.method == 'POST':
 		tags = request.form.get("tags")
-	# cursor = conn.cursor()
-	# cursor.execute("SELECT p_id, tags FROM tagged_photos where tags = '{0}'".format(p_id))
+		
 		tagged = getTaggedPhotos(tags)
 
-		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged )
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged , base64 = base64)
 
 	else: 
-
-		return render_template('tags.html', name= flask_login.current_user.id, message = "Found")
+		tags = request.form.get("tags")
+		cursor = conn.cursor()
+		cursor.execute("SELECT tags, COUNT(*) AS magnitude FROM tagged_photos GROUP BY tags ORDER BY magnitude DESC LIMIT 5")
+		famous = cursor.fetchall()
+		print(" ")
+		print(" ")
+		print(" ")
+		print(famous)
+		print(" ")
+		print(" ")
+		print(" ")
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found", famous = famous, base64=base64)
 
 
 
