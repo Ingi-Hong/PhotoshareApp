@@ -343,11 +343,20 @@ def social():
 def tags():
 	if request.method == 'POST':
 		tags = request.form.get("tags")
+
+		
 		tagged = getTaggedPhotos(tags)
-		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged )
+
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found",tagged = tagged , base64 = base64)
 
 	else: 
-		return render_template('tags.html', name= flask_login.current_user.id, message = "Found")
+		tags = request.form.get("tags")
+		cursor = conn.cursor()
+		cursor.execute("SELECT tags, COUNT(*) AS magnitude FROM tagged_photos GROUP BY tags ORDER BY magnitude DESC LIMIT 5")
+		famous = cursor.fetchall()
+		
+		return render_template('tags.html', name= flask_login.current_user.id, message = "Found", famous = famous, base64=base64)
+
 
 @app.route('/delete', methods = ['GET', 'POST'])
 @flask_login.login_required

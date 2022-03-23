@@ -15,10 +15,18 @@
     <input type="submit" value="Look" />
 </form>
 
-{% if tagged%}
+<head> Most popular tags</head>
+    {% if famous %} 
+    {% for f in famous %}
+    <li>{{f}}</li>
+    {% endfor %}
+    {% endif %} 
+
+{% if tagged %}
 Results:
-    {% for tag in tagged %}
-    <li>{{tag[0]}}</li>
+   <li> {% for tag in tagged %}
+    <img src='data:image/jpg;base64, {{ base64.b64encode(tag[0]).decode("ascii") }}'/>
+   </li> 
     {% endfor %}
     {% endif %}
 
